@@ -1,0 +1,8 @@
+wheel
+pandas
+openai-whisper
+moviepy
+srt
+stable-ts
+xlsxwriter-3.1.4
+mypy

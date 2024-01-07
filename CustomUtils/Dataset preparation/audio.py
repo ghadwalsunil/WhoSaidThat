@@ -10,7 +10,6 @@ video_files = [
 ]
 
 for f in video_files:
-
     # Load the video clip
     video_clip = VideoFileClip(os.path.join(video_dir, f))
 

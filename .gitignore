@@ -9,6 +9,9 @@ tests/
 exps/
 demo/*
 Videos/*
+Dataset/*
+Clips/*
+zzz.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

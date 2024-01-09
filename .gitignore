@@ -4,6 +4,7 @@
 *.wav
 *.mp4
 *.pcm
+*.xlsx
 data/
 tests/
 exps/

@@ -15,12 +15,28 @@ from scenedetect.detectors import ContentDetector
 from model.faceDetector.s3fd import S3FD
 from talkNet import talkNet
 
+from pyannote.core import Segment, Annotation
+from pyannote.core import notebook
+import matplotlib.pyplot as plt
+
+from dotenv import load_dotenv
+
+load_dotenv()
+from pyannote.audio import Pipeline
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
+pretrained_pipeline = Pipeline.from_pretrained(
+    "pyannote/speaker-diarization-3.0", use_auth_token=os.getenv("HUGGINGFACE_TOKEN")
+)
+pretrained_pipeline.to(torch.device("cuda"))
+
 warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser(description="TalkNet Demo or Columnbia ASD Evaluation")
 
 parser.add_argument("--videoName", type=str, default="001", help="Demo video name")
-parser.add_argument("--videoFolder", type=str, default="demo", help="Path for inputs, tmps and outputs")
+parser.add_argument("--videoFolder", type=str, default="Dataset/Videos", help="Path for inputs")
+parser.add_argument("--outputFolder", type=str, default="output", help="Path for tmps and outputs")
 parser.add_argument(
     "--pretrainModel", type=str, default="pretrain_TalkSet.model", help="Path for the pretrained TalkNet model"
 )
@@ -82,7 +98,7 @@ if args.evalCol == True:
         os.remove(args.videoFolder + "/col_labels.tar.gz")
 else:
     args.videoPath = glob.glob(os.path.join(args.videoFolder, args.videoName + ".*"))[0]
-    args.savePath = os.path.join(args.videoFolder, args.videoName)
+    args.savePath = os.path.join(args.outputFolder, args.videoName)
 
 
 def scene_detect(args):
@@ -434,6 +450,27 @@ def evaluate_col_ASD(tracks, scores, args):
     print("Average F1:%.2f" % (100 * (F1s / 5)))
 
 
+def create_annotation_plot(speaker_timelines, args):
+    custom_diarization = Annotation()
+
+    for speaker_key in speaker_timelines.keys():
+        for timeline in speaker_timelines[speaker_key]:
+            custom_diarization[Segment(timeline[0], timeline[1])] = speaker_key
+
+    # Create a figure
+    fig, ax = plt.subplots(figsize=(10, 2))
+
+    # Plot the custom diarization result
+    notebook.plot_annotation(custom_diarization, ax, legend=True)
+
+    # Customize the plot (if needed)
+    ax.set_xlabel("Time")
+    ax.set_yticks([])  # To hide the y-axis
+
+    # Save the figure
+    fig.savefig(os.path.join(args.savePath, "audio_diarization.png"), bbox_inches="tight")
+
+
 # Main function
 def main():
     # This preprocesstion is modified based on this [repository](https://github.com/joonson/syncnet_python).
@@ -562,6 +599,19 @@ def main():
     else:
         # Visualization, save the result as the new video
         visualization(vidTracks, scores, args)
+
+    # Perform audio diarization
+
+    diarization = pretrained_pipeline(os.path.join(args.pyaviPath, "audio.wav"))
+
+    audio_output = {}
+    for duration, _, speaker_key in diarization.itertracks(yield_label=True):
+        if speaker_key in audio_output.keys():
+            audio_output[speaker_key].append((duration.start, duration.end))
+        else:
+            audio_output[speaker_key] = [(duration.start, duration.end)]
+
+    create_annotation_plot(audio_output, args)
 
 
 if __name__ == "__main__":

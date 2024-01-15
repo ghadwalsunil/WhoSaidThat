@@ -22,7 +22,7 @@ from datetime import datetime
 from sklearn.cluster import DBSCAN
 
 warnings.filterwarnings("ignore")
-
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 def scene_detect(args):
     # CPU: Scene detection, output is the list of each shot's time duration
@@ -291,11 +291,11 @@ def convert_to_ranges(lst, frame_rate):
     ranges = []
     start = lst[0]
 
-    threshold = 2
+    threshold = round(frame_rate / 10) * 2
 
     for i in range(1, len(lst)):
         if lst[i] - lst[i - 1] > threshold:
-            ranges.append((start / frame_rate, lst[i - 1] / frame_rate))
+            ranges.append((round(start / frame_rate, 2), round(lst[i - 1] / frame_rate, 2)))
             start = lst[i]
 
     # Add the last range

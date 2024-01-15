@@ -12,6 +12,8 @@ demo/*
 Videos/*
 Dataset/*
 Clips/*
+output/*
+.vscode/*
 zzz.py
 
 # Byte-compiled / optimized / DLL files

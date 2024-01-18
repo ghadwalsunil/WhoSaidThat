@@ -353,6 +353,7 @@ def visualization(tracks, scores, args):
                 (0, clr, 255 - clr),
                 5,
             )
+        cv2.imwrite(fname, image)
         vOut.write(image)
     vOut.release()
     command = "ffmpeg -y -i %s -i %s -threads %d -c:v copy -c:a copy %s -loglevel panic" % (

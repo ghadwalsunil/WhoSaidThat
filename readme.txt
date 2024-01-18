@@ -21,3 +21,5 @@ pip install python-dotenv
 pip install face-recognition
 pip install scikit-learn
 pip install openpyxl
+
+pip install pydub

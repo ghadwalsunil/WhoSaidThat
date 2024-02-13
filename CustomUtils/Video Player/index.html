@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Video Player</title>
+        <link
+            href="https://vjs.zencdn.net/8.10.0/video-js.css"
+            rel="stylesheet"
+        />
+        <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+        <link rel="stylesheet" href="custom.css" />
+    </head>
+    <body>
+        <!-- Make the video container and timeline container side-by side taking 50% each -->
+        <div class="video-container">
+            <video id="video" class="video-js vjs-default-skin" controls>
+                <source
+                    src="../Set 1/StarTalk_Sleep_1980_2041.mp4"
+                    type="video/mp4"
+                />
+            </video>
+            <div class="subtitles" id="subtitles"></div>
+        </div>
+        <div class="timeline-container">
+            <img
+                class="timeline"
+                src="StarTalk_Sleep_1980_2041_video.png"
+                alt="Timeline"
+            />
+            <img
+                class="timeline"
+                src="StarTalk_Sleep_1980_2041_audio.png"
+                alt="Timeline"
+            />
+            <div class="indicator"></div>
+        </div>
+        <script src="StarTalk_Sleep_1980_2041_av_wordTimestamps.js"></script>
+        <script src="StarTalk_Sleep_1980_2041_av_subtitles.js"></script>
+        <script>
+            const video = document.getElementById("video");
+            const subtitlesDiv = document.getElementById("subtitles");
+
+            video.addEventListener("timeupdate", () => {
+                const currentTime = video.currentTime;
+
+                // Find the current subtitle
+                const currentSubtitle = subtitles.find(
+                    (subtitle) =>
+                        currentTime >= subtitle.segment_start &&
+                        currentTime <= subtitle.segment_end
+                );
+
+                // Update subtitles display
+                if (currentSubtitle) {
+                    // Find the index of the current subtitle
+                    const subtitleIndex = subtitles.indexOf(currentSubtitle);
+
+                    // Split current subtitle text into words
+                    const words = currentSubtitle.text.split(" ");
+
+                    // Highlight only the word that matches the current timestamp
+                    const highlightedWords = words.map((word, index) => {
+                        const wordTimestamp = wordTimestamps[
+                            subtitleIndex
+                        ].find(
+                            (timestamp) =>
+                                currentTime >= timestamp.word_start &&
+                                currentTime <= timestamp.word_end
+                        );
+                        wordIndex =
+                            wordTimestamps[subtitleIndex].indexOf(
+                                wordTimestamp
+                            );
+                        if (wordTimestamp) {
+                            // Highlight only if this word matches the current timestamp
+                            if (index === wordIndex) {
+                                return `<span class="highlight">${word}</span>`;
+                            } else {
+                                return word;
+                            }
+                        } else {
+                            return word;
+                        }
+                    });
+
+                    // Set the subtitlesDiv innerHTML to the newly highlighted words
+                    subtitlesDiv.innerHTML = highlightedWords.join(" ");
+                    if (currentSubtitle.speaker)
+                        subtitlesDiv.innerHTML +=
+                            "<br><br><i>" + currentSubtitle.speaker + "</i>";
+                } else {
+                    subtitlesDiv.innerHTML = ""; // No subtitle found
+                }
+            });
+        </script>
+        <script>
+            const indicator = document.querySelector(".indicator");
+
+            video.addEventListener("timeupdate", () => {
+                const progress = ((video.currentTime / video.duration) * 97) + 1.5;
+                indicator.style.left = `${progress}%`;
+            });
+        </script>
+    </body>
+</html>

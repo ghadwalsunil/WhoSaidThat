@@ -2,8 +2,8 @@ import os
 from shutil import rmtree
 from typing import List
 
-import params
-from preprocess import utils
+from who_said_that import params
+from who_said_that.preprocess import utils
 
 
 class Preprocess:
@@ -37,9 +37,8 @@ class Preprocess:
         os.mkdir(params.JS_OUTPUT_FOLDER)
         os.mkdir(params.PLOT_OUTPUT_FOLDER)
 
-        if os.path.exists(self.video_output_folder):
-            rmtree(self.video_output_folder)
-        os.mkdir(self.video_output_folder)
+        if not os.path.exists(self.video_output_folder):
+            os.mkdir(self.video_output_folder)
 
         for video_file in self.video_files:
             savePath = os.path.join(self.video_output_folder, video_file)

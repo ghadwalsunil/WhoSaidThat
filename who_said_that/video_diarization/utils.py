@@ -8,7 +8,8 @@ import face_recognition
 import numpy as np
 import pandas as pd
 from tqdm import tqdm as tqdm_progress
-from video_diarization import util_components
+
+from who_said_that.video_diarization import util_components
 
 
 def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):

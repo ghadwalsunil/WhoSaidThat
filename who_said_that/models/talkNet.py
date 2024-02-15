@@ -1,17 +1,15 @@
-import os
 import subprocess
 import sys
 import time
 
-import numpy
 import pandas
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import tqdm
-from models.loss import lossA, lossAV, lossV
 
-from utils.model.talkNetModel import talkNetModel
+from who_said_that.models.loss import lossA, lossAV, lossV
+from who_said_that.utils.model.talkNetModel import talkNetModel
 
 
 class talkNet(nn.Module):

@@ -1,9 +1,13 @@
 import torch
 import torch.nn as nn
 
-from utils.model.attentionLayer import attentionLayer
-from utils.model.audioEncoder import audioEncoder
-from utils.model.visualEncoder import visualConv1D, visualFrontend, visualTCN
+from who_said_that.utils.model.attentionLayer import attentionLayer
+from who_said_that.utils.model.audioEncoder import audioEncoder
+from who_said_that.utils.model.visualEncoder import (
+    visualConv1D,
+    visualFrontend,
+    visualTCN,
+)
 
 
 class talkNetModel(nn.Module):

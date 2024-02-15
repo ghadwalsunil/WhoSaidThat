@@ -3,7 +3,8 @@ import os
 from datetime import timedelta
 
 import srt
-from create_subtitles import util_components
+
+from who_said_that.subtitle_creation import util_components
 
 
 def generate_subtitles(

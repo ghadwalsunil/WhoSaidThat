@@ -5,9 +5,11 @@ from typing import Optional
 
 import torch
 import whisper
-from models import utils
-from models.talkNet import talkNet
 from pyannote.audio import Pipeline
+
+from who_said_that import params
+from who_said_that.models import utils
+from who_said_that.models.talkNet import talkNet
 
 
 class Models:
@@ -53,6 +55,9 @@ class Models:
                 pretrained_pipeline_name, use_auth_token=os.getenv
             )
             pretrained_pipeline.to(torch.device("cuda"))
+            if params.PRETRAINED_PIPELINE_PARAMS is not None:
+                pretrained_pipeline.instantiate(params.PRETRAINED_PIPELINE_PARAMS)
+                pretrained_pipeline.parameters(instantiated=True)
             sys.stderr.write(
                 "Successfully loaded the pretrained model pyannote/speaker-diarization-3.0 \r\n"
             )

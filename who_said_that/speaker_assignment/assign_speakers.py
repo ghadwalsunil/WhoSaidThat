@@ -1,10 +1,9 @@
 import os
 import pickle
-import sys
-import time
 
 import pandas as pd
-from speaker_assignment import utils
+
+from who_said_that.speaker_assignment import utils
 
 
 class AssignSpeakers:
@@ -43,15 +42,17 @@ class AssignSpeakers:
 
     def perform_speaker_assignment(self):
 
-        self.transcriptions_df = utils.assign_speakers(
-            self.transcriptions_df,
-            self.final_video_output,
-            self.final_audio_output,
-            self.video_files,
+        final_df = self.transcriptions_df.copy()
+
+        final_df = utils.assign_speakers(
+            final_df=final_df,
+            final_video_output=self.final_video_output,
+            final_audio_output=self.final_audio_output,
+            video_files=self.video_files,
         )
 
         utils.get_stats(
-            transcription_df=self.transcriptions_df,
+            final_df=final_df,
             final_audio_output=self.final_audio_output,
             final_video_output=self.final_video_output,
             run_output_folder=self.run_output_path,

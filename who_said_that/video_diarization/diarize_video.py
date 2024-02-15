@@ -3,11 +3,11 @@ import pickle
 import sys
 import time
 
-import params
 from pydub import AudioSegment
-from video_diarization import utils
 
-from utils import components
+from who_said_that import params
+from who_said_that.utils import components
+from who_said_that.video_diarization import utils
 
 
 class VideoDiarization:

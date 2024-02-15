@@ -1,9 +1,9 @@
 import os
-import pickle
 
 import pandas as pd
-import params
-from create_subtitles import utils
+
+from who_said_that import params
+from who_said_that.subtitle_creation import utils
 
 
 class CreateSubtitles:

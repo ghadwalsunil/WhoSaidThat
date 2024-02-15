@@ -3,9 +3,9 @@ import sys
 import time
 from typing import List
 
-import params
-from models.talkNet import talkNet
-from talkNetASD import utils
+from who_said_that import params
+from who_said_that.models.talkNet import talkNet
+from who_said_that.talkNetASD import utils
 
 
 class TalkNetASD:

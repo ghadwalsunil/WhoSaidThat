@@ -1,19 +1,20 @@
 import os
 import sys
 
-import params
-from who_said_that.speaker_assignment.assign_speakers import AssignSpeakers
-from who_said_that.audio_diarization.diarize_video import AudioDiarization
-from who_said_that.subtitle_creation.create_subtitles import CreateSubtitles
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
+
+from who_said_that import params
+from who_said_that.audio_diarization.diarize_audio import AudioDiarization
 from who_said_that.models.get_models import Models
 from who_said_that.preprocess.preprocess_input import Preprocess
+from who_said_that.speaker_assignment.assign_speakers import AssignSpeakers
+from who_said_that.subtitle_creation.create_subtitles import CreateSubtitles
 from who_said_that.talkNetASD.perform_talkNetASD import TalkNetASD
 from who_said_that.video_diarization.diarize_video import VideoDiarization
 
 load_dotenv()
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Setup parameters
 models = Models(
@@ -24,7 +25,7 @@ models = Models(
 
 talknet_model = models.get_talknet_model(params.TALKNET_PRETRAIN_MODEL_PATH)
 pretrained_pipeline = models.get_pretrained_pipeline(params.PRETRAINED_PIPELINE_NAME)
-# # whisper_model = models.get_whisper_model(model_name=params.WHISPER_MODEL_NAME)
+whisper_model = models.get_whisper_model(model_name=params.WHISPER_MODEL_NAME)
 
 # Preprocess
 preprocess = Preprocess(
@@ -58,7 +59,7 @@ videoDiarization = VideoDiarization(
 
 videoDiarization.perform_video_diarization()
 
-# # Audio Diarization
+# Audio Diarization
 audioDiarization = AudioDiarization(
     video_files=params.VIDEO_FILES,
     video_folder=params.VIDEO_FOLDER,
@@ -79,7 +80,7 @@ assign_speakers = AssignSpeakers(
 
 assign_speakers.perform_speaker_assignment()
 
-# # Create srt and js files
+# Create srt and js files
 create_subtitles = CreateSubtitles(
     run_output_path=params.RUN_OUTPUT_FOLDER,
     video_files=params.VIDEO_FILES,

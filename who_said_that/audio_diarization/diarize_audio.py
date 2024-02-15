@@ -3,10 +3,10 @@ import pickle
 import sys
 import time
 
-import params
 from pydub import AudioSegment
 
-from utils import components
+from who_said_that import params
+from who_said_that.utils import components
 
 
 class AudioDiarization:

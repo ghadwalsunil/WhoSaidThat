@@ -8,9 +8,9 @@ import numpy as np
 import torch
 from torchvision import transforms
 
-from .box_utils import nms_
-from .nets import S3FDNet
-import params
+from who_said_that import params
+from who_said_that.utils.model.faceDetector.s3fd.box_utils import nms_
+from who_said_that.utils.model.faceDetector.s3fd.nets import S3FDNet
 
 if os.path.isfile(params.S3FD_PATH_WEIGHT) == False:
     Link = "1KafnHz7ccT-3IyddBsL5yi2xGtxAKypt"
@@ -42,7 +42,9 @@ class S3FD:
 
         with torch.no_grad():
             for s in scales:
-                scaled_img = cv2.resize(image, dsize=(0, 0), fx=s, fy=s, interpolation=cv2.INTER_LINEAR)
+                scaled_img = cv2.resize(
+                    image, dsize=(0, 0), fx=s, fy=s, interpolation=cv2.INTER_LINEAR
+                )
 
                 scaled_img = np.swapaxes(scaled_img, 1, 2)
                 scaled_img = np.swapaxes(scaled_img, 1, 0)

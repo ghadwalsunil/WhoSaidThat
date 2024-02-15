@@ -1,22 +1,23 @@
 import os
 
 import pandas as pd
-from speaker_assignment import util_components
+
+from who_said_that.speaker_assignment import util_components
 
 
 def assign_speakers(
-    transcriptions_df: pd.DataFrame,
+    final_df: pd.DataFrame,
     final_video_output: dict,
     final_audio_output: dict,
     video_files: list,
 ):
 
-    transcriptions_df["video_name"] = transcriptions_df["file_name"].apply(
+    final_df["video_name"] = final_df["file_name"].apply(
         lambda x: os.path.splitext(x)[0]
     )
     df_videos = pd.DataFrame({"video_name": video_files})
-    transcriptions_df = transcriptions_df.merge(df_videos, how="inner")
-    transcriptions_df["word_end_modified"] = transcriptions_df.apply(
+    final_df = final_df.merge(df_videos, how="inner")
+    final_df["word_end_modified"] = final_df.apply(
         lambda row: (
             (row["word_end"] + 0.01)
             if row["word_start"] == row["word_end"]
@@ -24,20 +25,18 @@ def assign_speakers(
         ),
         axis=1,
     )
-    transcriptions_df["predicted_speakers_video"] = transcriptions_df[
-        "video_name"
-    ].apply(lambda x: len(final_video_output[x].keys()))
-    transcriptions_df["predicted_speakers_audio"] = transcriptions_df[
-        "video_name"
-    ].apply(lambda x: len(final_audio_output[x].keys()))
+    final_df["predicted_speakers_video"] = final_df["video_name"].apply(
+        lambda x: len(final_video_output[x].keys())
+    )
+    final_df["predicted_speakers_audio"] = final_df["video_name"].apply(
+        lambda x: len(final_audio_output[x].keys())
+    )
 
-    return transcriptions_df
+    return final_df
 
 
-def get_stats(
-    transcription_df, final_audio_output, final_video_output, run_output_folder
-):
-    final_df = transcription_df.copy()
+def get_stats(final_df, final_audio_output, final_video_output, run_output_folder):
+
     final_df["a_assigned_speaker"] = final_df.apply(
         lambda row: util_components.get_word_to_speaker_mapping(
             row["word_start"],

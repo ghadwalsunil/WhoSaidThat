@@ -12,9 +12,9 @@ from scenedetect.detectors import ContentDetector
 from scenedetect.scene_manager import SceneManager
 from scenedetect.stats_manager import StatsManager
 from scenedetect.video_manager import VideoManager
-from talkNetASD import util_components
 
-from utils.model.faceDetector import S3FD
+from who_said_that.talkNetASD import util_components
+from who_said_that.utils.model.faceDetector import S3FD
 
 
 def scene_detect(videoFilePath: str, pyworkPath: str):

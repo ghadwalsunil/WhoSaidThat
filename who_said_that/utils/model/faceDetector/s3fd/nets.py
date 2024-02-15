@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
 
-from .box_utils import Detect, PriorBox
+from who_said_that.utils.model.faceDetector.s3fd.box_utils import Detect, PriorBox
 
 
 class L2Norm(nn.Module):

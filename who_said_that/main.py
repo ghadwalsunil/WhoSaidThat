@@ -2,14 +2,14 @@ import os
 import sys
 
 import params
-from assign_speakers.assign_speakers import AssignSpeakers
-from audio_diarization.audio_diarization import AudioDiarization
-from create_subtitles.create_subtitles import CreateSubtitles
+from who_said_that.speaker_assignment.assign_speakers import AssignSpeakers
+from who_said_that.audio_diarization.diarize_video import AudioDiarization
+from who_said_that.subtitle_creation.create_subtitles import CreateSubtitles
 from dotenv import load_dotenv
-from models.models import Models
-from preprocess.preprocess import Preprocess
-from talkNetASD.talkNetASD import TalkNetASD
-from video_diarization.video_diarization import VideoDiarization
+from who_said_that.models.get_models import Models
+from who_said_that.preprocess.preprocess_input import Preprocess
+from who_said_that.talkNetASD.perform_talkNetASD import TalkNetASD
+from who_said_that.video_diarization.diarize_video import VideoDiarization
 
 load_dotenv()
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"

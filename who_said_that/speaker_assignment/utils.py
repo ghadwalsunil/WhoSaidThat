@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-from assign_speakers import util_components
+from speaker_assignment import util_components
 
 
 def assign_speakers(

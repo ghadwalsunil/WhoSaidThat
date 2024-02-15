@@ -4,7 +4,7 @@ import sys
 import time
 
 import pandas as pd
-from assign_speakers import utils
+from speaker_assignment import utils
 
 
 class AssignSpeakers:

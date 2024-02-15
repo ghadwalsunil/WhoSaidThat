@@ -21,7 +21,10 @@ JS_OUTPUT_FOLDER = "output/run_output/js"
 PLOT_OUTPUT_FOLDER = "output/run_output/plots"
 
 # TalkNet parameters
-TALKNET_PRETRAIN_MODEL_PATH = "pretrain_TalkSet.model"
+TALKNET_PRETRAIN_MODEL_PATH = "who_said_that/utils/pretrain_TalkSet.model"
+
+# S3FD parameters
+S3FD_PATH_WEIGHT = "who_said_that/utils/sfd_face.pth"
 
 # WhisperNet parameters
 WHISPER_MODEL_NAME = "medium.en"

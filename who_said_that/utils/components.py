@@ -1,8 +1,10 @@
 import os
+import cv2
 
 import matplotlib.pyplot as plt
 from pyannote.core import Annotation, Segment
 from pyannote.core.notebook import Notebook
+import pandas as pd
 
 
 def create_annotation_plot(

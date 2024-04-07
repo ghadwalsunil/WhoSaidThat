@@ -16,6 +16,7 @@ output/*
 .vscode/*
 zzz.py
 old_code/*
+vosk-model-en-us-0.42-gigaspeech.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

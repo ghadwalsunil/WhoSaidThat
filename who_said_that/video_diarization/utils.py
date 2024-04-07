@@ -13,9 +13,8 @@ from who_said_that.video_diarization import util_components
 
 
 def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):
-    sys.stderr.write(
-        time.strftime("%Y-%m-%d %H:%M:%S") + " Starting generation of face encodings"
-    )
+
+    sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Starting generation of face encodings \r\n")
 
     flist = glob.glob(os.path.join(pyframesPath, "*.jpg"))
     flist.sort()
@@ -25,9 +24,7 @@ def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):
     for tidx, track in enumerate(tracks):
         score = scores[tidx]
         for fidx, frame in enumerate(track["track"]["frame"].tolist()):
-            s = score[
-                max(fidx - 2, 0) : min(fidx + 3, len(score) - 1)
-            ]  # average smoothing
+            s = score[max(fidx - 2, 0) : min(fidx + 3, len(score) - 1)]  # average smoothing
             s = float(np.mean(s))
             if s > 0:
                 track_data = {
@@ -48,9 +45,7 @@ def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):
         for track_id in faces[frame_id].keys():
             total_frame_tracks += 1
 
-    progress_bar = tqdm_progress(
-        total=total_frame_tracks, unit="faces", dynamic_ncols=True
-    )
+    progress_bar = tqdm_progress(total=total_frame_tracks, unit="faces", dynamic_ncols=True)
     for fidx, frame_id in enumerate(faces.keys()):
         image = face_recognition.load_image_file(flist[frame_id])
         for track_id in faces[frame_id].keys():
@@ -58,31 +53,17 @@ def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):
                 image,
                 [
                     (
-                        int(
-                            faces[frame_id][track_id]["y"]
-                            - faces[frame_id][track_id]["s"]
-                        ),
-                        int(
-                            faces[frame_id][track_id]["x"]
-                            + faces[frame_id][track_id]["s"]
-                        ),
-                        int(
-                            faces[frame_id][track_id]["y"]
-                            + faces[frame_id][track_id]["s"]
-                        ),
-                        int(
-                            faces[frame_id][track_id]["x"]
-                            - faces[frame_id][track_id]["s"]
-                        ),
+                        int(faces[frame_id][track_id]["y"] - faces[frame_id][track_id]["s"]),
+                        int(faces[frame_id][track_id]["x"] + faces[frame_id][track_id]["s"]),
+                        int(faces[frame_id][track_id]["y"] + faces[frame_id][track_id]["s"]),
+                        int(faces[frame_id][track_id]["x"] - faces[frame_id][track_id]["s"]),
                     )
                 ],
                 model="small",
             )[0]
             progress_bar.update(1)
     progress_bar.close()
-    sys.stderr.write(
-        time.strftime("%Y-%m-%d %H:%M:%S") + " Face encoding generation completed"
-    )
+    sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Face encoding generation completed \r\n")
 
     rows = []
     for frame, tracks in faces.items():
@@ -100,25 +81,48 @@ def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):
             )
 
     df = pd.DataFrame(rows)
-    df["Clusters"] = util_components.perform_clustering(df["Encoding"].to_list())
-
     savePath = os.path.join(pyworkPath, "encoding_df.pckl")
     df.to_pickle(savePath)
 
     return df
 
 
-def get_final_tracks(pyworkPath, frameRate):
+def perform_clustering(pyworkPath, simple_clustering=True, enhanced_clustering=True):
+    df: pd.DataFrame = pd.read_pickle(os.path.join(pyworkPath, "encoding_df.pckl"))
+    if simple_clustering:
+        df["SimpleClusters"] = util_components.perform_clustering(df["Encoding"].to_list(), max_clusters=6)
+
+    if enhanced_clustering:
+        final_df_cents, track_centroids_df = util_components.get_subset(df)
+        track_centroids_df["Track_Cluster_Cluster_ID"] = util_components.perform_clustering(
+            list(track_centroids_df["Track_Cluster_Centroid"]), max_clusters=12
+        )
+
+        final_df_cents = final_df_cents.merge(
+            track_centroids_df[["Track", "Track_Cluster_ID", "Track_Cluster_Cluster_ID"]],
+            on=["Track", "Track_Cluster_ID"],
+        )
+
+        final_df_cents = util_components.get_final_cluster_ids(final_df_cents)
+
+        df = df.merge(final_df_cents[["Track", "EnhancedClusters"]].drop_duplicates(), on="Track")
+
+    savePath = os.path.join(pyworkPath, "encoding_df_w_clustering.pckl")
+    df.to_pickle(savePath)
+
+    return df
+
+
+def get_final_tracks(pyworkPath, frameRate, cluster_column="SimpleClusters"):
     final_tracks = {}
-    df = pd.read_pickle(os.path.join(pyworkPath, "encoding_df.pckl"))
-    for idx in df["Clusters"].unique():
+    df = pd.read_pickle(os.path.join(pyworkPath, "encoding_df_w_clustering.pckl"))
+    df = df.sort_values(by=[cluster_column, "Frame"])
+    for idx in df[cluster_column].unique():
         speaker_key = "SPEAKER_{:02d}".format(idx)
-        final_tracks[speaker_key] = df[df["Clusters"] == idx]["Frame"].to_list()
+        final_tracks[speaker_key] = df[df[cluster_column] == idx]["Frame"].to_list()
 
     for key in final_tracks.keys():
-        final_tracks[key] = util_components.convert_to_ranges(
-            final_tracks[key], frameRate
-        )
+        final_tracks[key] = util_components.convert_to_ranges(final_tracks[key], frameRate)
 
     with open(os.path.join(pyworkPath, "video_diarization_output.pckl"), "wb") as fil:
         pickle.dump(final_tracks, fil)

@@ -1,4 +1,6 @@
 import os
+import sys
+import time
 
 import pandas as pd
 
@@ -24,6 +26,10 @@ class CreateSubtitles:
         )
 
     def create_subtitles(self):
+
+        sys.stderr.write(
+            time.strftime("%Y-%m-%d %H:%M:%S") + " Generating subtitles \r\n"
+        )
 
         utils.generate_subtitles(
             self.final_output_df,

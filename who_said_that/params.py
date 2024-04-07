@@ -1,24 +1,10 @@
-# Input paramters
-VIDEO_FOLDER = "Dataset/Videos"
-VIDEO_FILES = [
-    # "StarTalk_Sleep_1602_1639"
-    # "StarTalk_Cosmic_1050_1130",
-    # "StarTalk_Cosmic_2600_2683",
-    # "StarTalk_Cosmic_780_850",
-    # "StarTalk_Farming_1700_1800",
-    # "StarTalk_FlyingVehicles_780_811",
-    # "StarTalk_Questions_690_750",
-    # "StarTalk_Sleep_1602_1639",
-    # "StarTalk_Sleep_1980_2041",
-    # "StarTalk_Sleep_2470_2551",
-    # "StarTalk_Sleep_748_796",
-]
 TRANSCRIPTION_DF_PATH = "Dataset/All_Transcriptions_WithSpeakers.xlsx"
 
 # Output parameters
 VIDEO_OUTPUT_FOLDER = "output/video_temp"
 RUN_OUTPUT_FOLDER = "output/run_output"
 PYAVI_FOLDER_NAME = "pyavi"
+PYWAV_FOLDER_NAME = "pywav"
 PYFRAMES_FOLDER_NAME = "pyframes"
 PYWORK_FOLDER_NAME = "pywork"
 PYCROP_FOLDER_NAME = "pycrop"
@@ -28,7 +14,7 @@ PLOT_OUTPUT_FOLDER = "output/run_output/plots"
 
 # TalkNet parameters
 TALKNET_PRETRAIN_MODEL_PATH = "who_said_that/utils/pretrain_TalkSet.model"
-
+# who_said_that/utils/msdwild.pretrained.model
 # S3FD parameters
 S3FD_PATH_WEIGHT = "who_said_that/utils/sfd_face.pth"
 

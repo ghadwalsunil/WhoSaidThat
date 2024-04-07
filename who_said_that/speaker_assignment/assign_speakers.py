@@ -1,9 +1,12 @@
 import os
 import pickle
+import sys
+import time
 
 import pandas as pd
-
+from typing import List
 from who_said_that.speaker_assignment import utils
+from who_said_that.params import VideoFile
 
 
 class AssignSpeakers:
@@ -11,18 +14,18 @@ class AssignSpeakers:
         self,
         transcriptions_path: str,
         run_output_path: str,
-        video_files: list,
+        video_files: List[VideoFile],
         video_folder: str,
     ):
-        if not video_files:
-            self.video_files = [
-                os.path.splitext(f)[0]
-                for f in os.listdir(video_folder)
-                if os.path.isfile(os.path.join(video_folder, f))
-                and os.path.splitext(os.path.join(video_folder, f))[1] in [".mp4"]
-            ]
-        else:
-            self.video_files = video_files
+        # if not video_files:
+        #     self.video_files = [
+        #         os.path.splitext(f)[0]
+        #         for f in os.listdir(video_folder)
+        #         if os.path.isfile(os.path.join(video_folder, f))
+        #         and os.path.splitext(os.path.join(video_folder, f))[1] in [".mp4"]
+        #     ]
+        # else:
+        self.video_files = video_files
         self.video_folder = video_folder
         self.transcriptions_path = transcriptions_path
         self.run_output_path = run_output_path
@@ -42,18 +45,35 @@ class AssignSpeakers:
 
     def perform_speaker_assignment(self):
 
-        final_df = self.transcriptions_df.copy()
-
-        final_df = utils.assign_speakers(
-            final_df=final_df,
-            final_video_output=self.final_video_output,
-            final_audio_output=self.final_audio_output,
-            video_files=self.video_files,
+        sys.stderr.write(
+            time.strftime("%Y-%m-%d %H:%M:%S") + " Assigning speakers and getting stats \r\n"
         )
 
-        utils.get_stats(
-            final_df=final_df,
-            final_audio_output=self.final_audio_output,
+        get_audio_video_mapping, final_video_audio_mapping = utils.get_audio_video_mapping(
             final_video_output=self.final_video_output,
+            final_audio_output=self.final_audio_output,
             run_output_folder=self.run_output_path,
         )
+
+        # final_df = self.transcriptions_df.copy()
+
+        # final_df = utils.get_video_stats(
+        #     final_df=final_df,
+        #     final_video_output=self.final_video_output,
+        #     final_audio_output=self.final_audio_output,
+        #     video_files=self.video_files,
+        # )
+
+        # final_df = utils.assign_speakers(
+        #     final_df=final_df,
+        #     final_audio_output=self.final_audio_output,
+        #     final_video_output=self.final_video_output,
+        #     run_output_folder=self.run_output_path,
+        #     final_video_audio_mapping=final_video_audio_mapping,
+        #     final_audio_video_mapping=get_audio_video_mapping,
+        # )
+
+        # utils.get_stats(
+        #     final_df=final_df,
+        #     run_output_folder=self.run_output_path,
+        # )

@@ -22,7 +22,7 @@ class AudioDiarization:
         self.video_file = video_file
         self.video_output_folder = video_output_folder
 
-    def perform_audio_diarization(self, pretrained_pipeline, pipeline_name):
+    def perform_audio_diarization(self, pretrained_pipeline, pipeline_name, videoDuration):
 
         sys.stderr.write(
             time.strftime("%Y-%m-%d %H:%M:%S")
@@ -31,7 +31,6 @@ class AudioDiarization:
         savePath = os.path.join(self.video_output_folder, self.video_file.save_name)
         pywavPath = os.path.join(savePath, params.PYWAV_FOLDER_NAME)
         audioFilePath = os.path.join(pywavPath, "audio.wav")
-        videoDuration = len(AudioSegment.from_file(audioFilePath)) / 1000
 
         diarization = pretrained_pipeline(audioFilePath)
 

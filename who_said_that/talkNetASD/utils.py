@@ -4,7 +4,7 @@ import pickle
 import subprocess
 import sys
 import time
-
+import face_recognition
 import cv2
 import numpy as np
 import tqdm
@@ -66,16 +66,21 @@ def inference_video(
     flist = glob.glob(os.path.join(pyframesPath, "*.jpg"))
     flist.sort()
     dets = []
-    for fidx, fname in enumerate(flist):
+    for fidx, fname in tqdm.tqdm(enumerate(flist), total=len(flist)):
         image = cv2.imread(fname)
         imageNumpy = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         bboxes = DET.detect_faces(imageNumpy, conf_th=0.9, scales=[facedetScale])
+        # image = face_recognition.load_image_file(fname)
+        # bboxes = face_recognition.face_locations(image)
+        # face_encodings = face_recognition.face_encodings(image, bboxes, model="large")
         dets.append([])
-        for bbox in bboxes:
+        for bbox_num, bbox in enumerate(bboxes):
+            # top, right, bottom, left = bbox
+            # new_bbox = np.array([left, top, right, bottom])
             dets[-1].append(
                 {"frame": fidx, "bbox": (bbox[:-1]).tolist(), "conf": bbox[-1]}
             )  # dets has the frames info, bbox info, conf info
-        sys.stderr.write("%s-%05d; %d dets\r" % (videoFilePath, fidx, len(dets[-1])))
+        # sys.stderr.write("%s-%05d; %d dets\r" % (videoFilePath, fidx, len(dets[-1])))
     savePath = os.path.join(pyworkPath, "faces.pckl")
     with open(savePath, "wb") as fil:
         pickle.dump(dets, fil)

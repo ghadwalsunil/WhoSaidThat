@@ -54,7 +54,7 @@ class Track:
             return max_cluster_id
 
         for track_cluster in self.track_cluster_list:
-            if track_cluster.track_cluster_percent >= 80:
+            if track_cluster.track_cluster_percent >= 50:
                 return track_cluster.track_cluster_cluster_id
             else:
                 break
@@ -65,7 +65,7 @@ class Track:
         for track_cluster in self.track_cluster_list:
             combined_percent += track_cluster.track_cluster_percent
             cluster_list.append(track_cluster.track_cluster_cluster_id)
-            if combined_percent >= 80:
+            if combined_percent >= 50:
                 break
 
         return cluster_list

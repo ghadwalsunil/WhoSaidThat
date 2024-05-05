@@ -28,6 +28,9 @@ class DiarizationEvaluateResults:
 
         video_results = {"video_name": self.video_file.save_name}
 
+        if self.video_file.ground_truth_file is None:
+            return video_results
+
         if self.video_file.ground_truth_type == "der":
             metric = DiarizationErrorRate()
 

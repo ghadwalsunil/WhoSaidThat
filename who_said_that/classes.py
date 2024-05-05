@@ -1,4 +1,6 @@
 from who_said_that.evaluation import utils
+from who_said_that.utils import components
+from who_said_that import params
 
 
 class PyannoteAudioSegment:
@@ -331,7 +333,7 @@ class DiarizationOutput:
                             else:
                                 audio_segment.vd_speaker = f"Unknown_{audio_segment.ad_12_speaker}"
 
-    def get_diarization_output(self):
+    def get_diarization_output(self, videoDuration, video_save_name, plot_name):
         diarize_output = {}
         for audio_segment in self.audio_segments:
             if audio_segment.vd_speaker not in diarize_output.keys():
@@ -339,6 +341,14 @@ class DiarizationOutput:
             diarize_output[audio_segment.vd_speaker].append(
                 (audio_segment.audio_segment_start, audio_segment.audio_segment_end)
             )
+
+        components.create_annotation_plot(
+            diarization_output=diarize_output,
+            save_path=params.PLOT_OUTPUT_FOLDER,
+            video_name=video_save_name,
+            video_duration=videoDuration,
+            plot_name=plot_name,
+        )
         return diarize_output
 
     def get_group_by_id(self, group_id):

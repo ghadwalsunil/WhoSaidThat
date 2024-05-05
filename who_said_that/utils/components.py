@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from pyannote.core import Annotation, Segment
 from pyannote.core.notebook import Notebook
 import pandas as pd
+import numpy as np
 
 
 def create_annotation_plot(
@@ -21,7 +22,7 @@ def create_annotation_plot(
             custom_diarization[Segment(timeline[0], timeline[1])] = speaker_key
 
     # Create a figure
-    fig, ax = plt.subplots(figsize=(10, 2))
+    fig, ax = plt.subplots(figsize=(15, 2))
 
     # Plot the custom diarization result
     nb = Notebook()
@@ -31,6 +32,7 @@ def create_annotation_plot(
     ax.set_xlabel("Time")
     ax.set_yticks([])  # To hide the y-axis
     ax.set_xlim(0, video_duration)
+    ax.set_xticks(np.arange(0, int(video_duration), int(video_duration/20)))
 
     # Save the figure
     saveFileName = os.path.join(save_path, f"{video_name}_{plot_name}.png")

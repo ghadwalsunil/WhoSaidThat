@@ -42,7 +42,7 @@ def convert_to_ranges(lst, frame_rate):
     ranges = []
     start = lst[0]
 
-    threshold = round(frame_rate / 10) * 3
+    threshold = round((frame_rate / 10) * 3)
 
     for i in range(1, len(lst)):
         if lst[i] - lst[i - 1] > threshold:

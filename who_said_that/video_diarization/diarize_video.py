@@ -16,7 +16,7 @@ class VideoDiarization:
         self.video_file = video_file
         self.video_output_folder = video_output_folder
 
-    def perform_video_diarization(self):
+    def perform_video_diarization(self, videoDuration):
 
         sys.stderr.write(
             time.strftime("%Y-%m-%d %H:%M:%S") + " Video diarization of video %s \r\n" % (self.video_file.save_name)
@@ -29,7 +29,6 @@ class VideoDiarization:
         audioFilePath = os.path.join(pywavPath, "audio.wav")
 
         # Get number of jpg files in pyframesPath
-        videoDuration = len(AudioSegment.from_file(audioFilePath)) / 1000
         # try:
         #     numFrames = len([f for f in os.listdir(pyframesPath) if f.endswith(".jpg")])
         # except FileNotFoundError:

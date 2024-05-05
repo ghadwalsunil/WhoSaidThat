@@ -90,7 +90,7 @@ def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):
 def perform_clustering(pyworkPath, simple_clustering=True, enhanced_clustering=True):
     df: pd.DataFrame = pd.read_pickle(os.path.join(pyworkPath, "encoding_df.pckl"))
     if simple_clustering:
-        df["SimpleClusters"] = util_components.perform_clustering(df["Encoding"].to_list(), max_clusters=6)
+        df["SimpleClusters"] = util_components.perform_clustering(df["Encoding"].to_list(), max_clusters=6, silhouette_threshold=0)
 
     if enhanced_clustering:
         final_df_cents, track_centroids_df = util_components.get_subset(df)

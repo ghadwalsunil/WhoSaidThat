@@ -13,12 +13,10 @@ class Preprocess:
     def __init__(
         self,
         video_file: VideoFile,
-        video_folder: str,
         run_output_folder: str,
         video_output_folder: str,
     ):
         self.video_file = video_file
-        self.video_folder = video_folder
         self.run_output_folder = run_output_folder
         self.video_output_folder = video_output_folder
 
@@ -27,9 +25,9 @@ class Preprocess:
         if not os.path.exists(self.video_output_folder):
             os.mkdir(self.video_output_folder)
 
-        input_video_path = os.path.join(self.video_folder, self.video_file.name + ".mp4")
+        input_video_path = os.path.join(self.video_file.video_folder, self.video_file.name + ".mp4")
         if not os.path.isfile(input_video_path):
-            input_video_path = os.path.join(self.video_folder, self.video_file.name + ".mkv")
+            input_video_path = os.path.join(self.video_file.video_folder, self.video_file.name + ".mkv")
             if not os.path.isfile(input_video_path):
                 sys.stderr.write("Video file not found: %s\n" % input_video_path)
                 return False

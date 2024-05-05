@@ -1,19 +1,23 @@
+import os
+
 TRANSCRIPTION_DF_PATH = "Dataset/All_Transcriptions_WithSpeakers.xlsx"
 
 # Output parameters
-VIDEO_OUTPUT_FOLDER = "output/video_temp"
-RUN_OUTPUT_FOLDER = "output/run_output"
+PARENT_DIR = "/home/sunil/projects/Stuff/Combined/WhoSaidThat"
+VIDEO_OUTPUT_FOLDER = os.path.join(PARENT_DIR, "output", "video_temp")
+RUN_OUTPUT_FOLDER = os.path.join(PARENT_DIR, "output", "run_output")
 PYAVI_FOLDER_NAME = "pyavi"
 PYWAV_FOLDER_NAME = "pywav"
 PYFRAMES_FOLDER_NAME = "pyframes"
 PYWORK_FOLDER_NAME = "pywork"
 PYCROP_FOLDER_NAME = "pycrop"
-SRT_OUTPUT_FOLDER = "output/run_output/srt"
-JS_OUTPUT_FOLDER = "output/run_output/js"
-PLOT_OUTPUT_FOLDER = "output/run_output/plots"
+SRT_OUTPUT_FOLDER = os.path.join(RUN_OUTPUT_FOLDER, "srt")
+JS_OUTPUT_FOLDER = os.path.join(RUN_OUTPUT_FOLDER, "js")
+PLOT_OUTPUT_FOLDER = os.path.join(RUN_OUTPUT_FOLDER, "plots")
 
 # TalkNet parameters
 TALKNET_PRETRAIN_MODEL_PATH = "who_said_that/utils/pretrain_TalkSet.model"
+# who_said_that/utils/pretrain_TalkSet.model
 # who_said_that/utils/msdwild.pretrained.model
 # S3FD parameters
 S3FD_PATH_WEIGHT = "who_said_that/utils/sfd_face.pth"

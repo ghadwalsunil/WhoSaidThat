@@ -1,54 +1,7 @@
-from pyannote.core import Annotation, Segment
 import pandas as pd
+from pyannote.core import Annotation, Segment
 
-
-def find_overlap(intervals1, intervals2):
-    overlap = 0
-    total_duration1 = 0
-    total_duration2 = 0
-
-    # Calculate the total duration of intervals in intervals1
-    for start, end in intervals1:
-        total_duration1 += end - start
-
-    # Calculate the total duration of intervals in intervals2 and find the overlap
-    for start, end in intervals2:
-        total_duration2 += end - start
-        for s1, e1 in intervals1:
-            common_start = max(s1, start)
-            common_end = min(e1, end)
-            if common_start < common_end:
-                overlap += common_end - common_start
-
-    # Calculate the percentage of overlap with respect to intervals1
-    if total_duration1 == 0:
-        percentage_overlap1 = 0
-    else:
-        percentage_overlap1 = (overlap / total_duration1) * 100
-
-    # Calculate the percentage of overlap with respect to intervals2
-    if total_duration2 == 0:
-        percentage_overlap2 = 0
-    else:
-        percentage_overlap2 = (overlap / total_duration2) * 100
-
-    return percentage_overlap1, percentage_overlap2
-
-
-def get_word_to_speaker_mapping(word_start, word_end, final_output):
-    final_speaker = None
-    max_overlap = 0
-
-    for speaker_key in final_output.keys():
-        word_overlap, _ = find_overlap([(word_start, word_end)], final_output[speaker_key])
-        if word_overlap > max_overlap:
-            final_speaker = speaker_key
-            max_overlap = word_overlap
-
-    if final_speaker is None:
-        final_speaker = "Unassigned"
-
-    return final_speaker
+from who_said_that.evaluation import util_components
 
 
 def match_output(output_df):
@@ -62,9 +15,13 @@ def match_output(output_df):
             speaker_match[assigned_speaker] = "Unassigned"
         else:
             speaker_match[assigned_speaker] = (
-                output_df[output_df["assigned_speaker"] == assigned_speaker]["speaker"].value_counts().idxmax()
+                output_df[output_df["assigned_speaker"] == assigned_speaker]["speaker"]
+                .value_counts()
+                .idxmax()
             )
-            speaker_count[assigned_speaker] = len(output_df[output_df["assigned_speaker"] == assigned_speaker])
+            speaker_count[assigned_speaker] = len(
+                output_df[output_df["assigned_speaker"] == assigned_speaker]
+            )
 
     temp_count = {}
 
@@ -110,24 +67,28 @@ def compute_performance(output_df):
             return "Correct"
 
     output_df["matched_result"] = output_df.apply(
-        lambda row: speaker_match(row["speaker"], row["assigned_speaker"], row["matched_speaker"]),
+        lambda row: speaker_match(
+            row["speaker"], row["assigned_speaker"], row["matched_speaker"]
+        ),
         axis=1,
     )
 
     return output_df["matched_result"].value_counts().to_dict()
 
 
-def compute_word_diarization_error_rate(ground_truth, diarization_output):
+def compute_word_diarization_error_rate(ground_truth: pd.DataFrame, diarization_output):
+
+    ground_truth = ground_truth.copy()
 
     ground_truth["assigned_speaker"] = ground_truth.apply(
         lambda row: (
-            get_word_to_speaker_mapping(
+            util_components.get_word_to_speaker_mapping(
                 row["word_start"],
                 row["word_end"],
                 diarization_output,
             )
             if row["word_end"] > row["word_start"]
-            else get_word_to_speaker_mapping(
+            else util_components.get_word_to_speaker_mapping(
                 row["word_start"],
                 row["word_end"] + 0.01,
                 diarization_output,
@@ -140,6 +101,39 @@ def compute_word_diarization_error_rate(ground_truth, diarization_output):
     return compute_performance(matched_df)
 
 
+def compute_word_diarization_error_rate_combined(
+    ground_truth: pd.DataFrame, audio_diarization_output, video_diarization_output
+):
+
+    final_audio_video_mapping, final_video_audio_mapping = (
+        util_components.get_audio_video_mapping(
+            final_video_output=video_diarization_output,
+            final_audio_output=audio_diarization_output,
+        )
+    )
+
+    ground_truth["assigned_speaker"] = ground_truth.apply(
+        lambda row: util_components.get_speaker_label(
+            row["word_start"],
+            (
+                row["word_end"]
+                if row["word_end"] > row["word_start"]
+                else row["word_end"] + 0.01
+            ),
+            video_diarization_output,
+            audio_diarization_output,
+            final_video_audio_mapping,
+            final_audio_video_mapping,
+        ),
+        axis=1,
+    )
+
+    ground_truth.to_excel("../del_later/temp_new.xlsx", index=False)
+
+    matched_df = match_output(ground_truth)
+    return compute_performance(matched_df)
+
+
 def convert_rttm_to_diarization(rttm_file, offset):
 
     # Read RTTM file into pandas DataFrame
@@ -147,7 +141,18 @@ def convert_rttm_to_diarization(rttm_file, offset):
         rttm_file,
         sep=" ",
         header=None,
-        names=["temp", "file_name", "channel", "start", "duration", "NA_1", "NA_2", "speaker_label", "NA_3", "NA_4"],
+        names=[
+            "temp",
+            "file_name",
+            "channel",
+            "start",
+            "duration",
+            "NA_1",
+            "NA_2",
+            "speaker_label",
+            "NA_3",
+            "NA_4",
+        ],
     )
 
     rttm_df.sort_values(by="start", inplace=True)

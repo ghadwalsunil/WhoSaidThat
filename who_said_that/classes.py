@@ -1,6 +1,5 @@
-from who_said_that.evaluation import utils
-from who_said_that.utils import components
 from who_said_that import params
+from who_said_that.utils import components
 
 
 class PyannoteAudioSegment:
@@ -67,27 +66,42 @@ class MappingClass:
     def __init__(self):
         self.mapping_dict = {}
 
-    def add_mapping(self, speaker_key_id, speaker_value_id, audio_segment_start, audio_segment_end):
+    def add_mapping(
+        self, speaker_key_id, speaker_value_id, audio_segment_start, audio_segment_end
+    ):
         if speaker_value_id == "Unknown":
             return
         if speaker_key_id not in self.mapping_dict.keys():
-            self.mapping_dict[speaker_key_id] = {speaker_value_id: audio_segment_end - audio_segment_start}
+            self.mapping_dict[speaker_key_id] = {
+                speaker_value_id: audio_segment_end - audio_segment_start
+            }
         else:
             if speaker_value_id not in self.mapping_dict[speaker_key_id].keys():
-                self.mapping_dict[speaker_key_id][speaker_value_id] = audio_segment_end - audio_segment_start
+                self.mapping_dict[speaker_key_id][speaker_value_id] = (
+                    audio_segment_end - audio_segment_start
+                )
             else:
-                self.mapping_dict[speaker_key_id][speaker_value_id] += audio_segment_end - audio_segment_start
+                self.mapping_dict[speaker_key_id][speaker_value_id] += (
+                    audio_segment_end - audio_segment_start
+                )
 
     def get_max_mapping(self, speaker_key_id):
         if speaker_key_id not in self.mapping_dict.keys():
             return None
 
-        return max(self.mapping_dict[speaker_key_id], key=self.mapping_dict[speaker_key_id].get)
+        return max(
+            self.mapping_dict[speaker_key_id], key=self.mapping_dict[speaker_key_id].get
+        )
 
 
 class DiarizationOutput:
     def __init__(
-        self, audio_diarization_03, audio_diarization_06, audio_diarization_09, audio_diarization_12, video_diarization
+        self,
+        audio_diarization_03,
+        audio_diarization_06,
+        audio_diarization_09,
+        audio_diarization_12,
+        video_diarization,
     ):
         self.audio_diarization_03 = audio_diarization_03
         self.audio_diarization_06 = audio_diarization_06
@@ -95,10 +109,18 @@ class DiarizationOutput:
         self.audio_diarization_12 = audio_diarization_12
         self.video_diarization = video_diarization
         self.audio_segments: list[PyannoteAudioSegment] = self.get_audio_segments()
-        self.ad03_video_mapping: MappingClass = self.perform_audio_video_mapping("ad_03")
-        self.ad06_video_mapping: MappingClass = self.perform_audio_video_mapping("ad_06")
-        self.ad09_video_mapping: MappingClass = self.perform_audio_video_mapping("ad_09")
-        self.ad12_video_mapping: MappingClass = self.perform_audio_video_mapping("ad_12")
+        self.ad03_video_mapping: MappingClass = self.perform_audio_video_mapping(
+            "ad_03"
+        )
+        self.ad06_video_mapping: MappingClass = self.perform_audio_video_mapping(
+            "ad_06"
+        )
+        self.ad09_video_mapping: MappingClass = self.perform_audio_video_mapping(
+            "ad_09"
+        )
+        self.ad12_video_mapping: MappingClass = self.perform_audio_video_mapping(
+            "ad_12"
+        )
         self.predict_unknowns()
 
     def get_corresponding_speaker(self, present_group_id, target_group_id, speaker_id):
@@ -118,12 +140,16 @@ class DiarizationOutput:
             return None
 
         if target_group_id in groups_not_allowed:
-            print(f"For present_group {present_group_id}, target_group should not be among {groups_not_allowed}")
+            print(
+                f"For present_group {present_group_id}, target_group should not be among {groups_not_allowed}"
+            )
             return None
 
         present_group = self.get_group_by_id(present_group_id)
         if speaker_id not in present_group.keys():
-            print(f"Speaker_id {speaker_id} not in present group {present_group_id} keys - {present_group.keys()}")
+            print(
+                f"Speaker_id {speaker_id} not in present group {present_group_id} keys - {present_group.keys()}"
+            )
             return None
 
         speaker_interval = present_group[speaker_id]
@@ -131,7 +157,9 @@ class DiarizationOutput:
 
         return self.get_mapping(speaker_interval, target_group)
 
-    def get_all_child_speakers(self, parent_group_id, child_group_id, parent_speaker_id):
+    def get_all_child_speakers(
+        self, parent_group_id, child_group_id, parent_speaker_id
+    ):
 
         if parent_group_id == "ad_12":
             groups_not_allowed = ["ad_12"]
@@ -148,7 +176,9 @@ class DiarizationOutput:
             return None
 
         if child_group_id in groups_not_allowed:
-            print(f"For parent_group {child_group_id}, child_group should not be among {groups_not_allowed}")
+            print(
+                f"For parent_group {child_group_id}, child_group should not be among {groups_not_allowed}"
+            )
             return None
 
         parent_group = self.get_group_by_id(parent_group_id)
@@ -164,7 +194,9 @@ class DiarizationOutput:
 
         for child_speaker_id in child_group.keys():
             _parent_speaker_id = self.get_corresponding_speaker(
-                present_group_id=child_group_id, target_group_id=parent_group_id, speaker_id=child_speaker_id
+                present_group_id=child_group_id,
+                target_group_id=parent_group_id,
+                speaker_id=child_speaker_id,
             )
 
             if _parent_speaker_id == parent_speaker_id:
@@ -172,7 +204,9 @@ class DiarizationOutput:
 
         return child_speakers
 
-    def get_native_speakers_in_parent_group(self, child_group_id, parent_group_id, child_speaker_id):
+    def get_native_speakers_in_parent_group(
+        self, child_group_id, parent_group_id, child_speaker_id
+    ):
 
         if child_group_id == "ad_03":
             groups_not_allowed = ["ad_03"]
@@ -189,7 +223,9 @@ class DiarizationOutput:
             return None
 
         if parent_group_id in groups_not_allowed:
-            print(f"For child_group {child_group_id}, parent_group should not be among {groups_not_allowed}")
+            print(
+                f"For child_group {child_group_id}, parent_group should not be among {groups_not_allowed}"
+            )
             return None
 
         child_group = self.get_group_by_id(child_group_id)
@@ -202,33 +238,48 @@ class DiarizationOutput:
         parent_group = self.get_group_by_id(parent_group_id)
 
         parent_speaker_id = self.get_corresponding_speaker(
-            target_group_id=parent_group_id, present_group_id=child_group_id, speaker_id=child_speaker_id
+            target_group_id=parent_group_id,
+            present_group_id=child_group_id,
+            speaker_id=child_speaker_id,
         )
 
         return self.get_all_child_speakers(
-            parent_group_id=parent_group_id, child_group_id=child_group_id, parent_speaker_id=parent_speaker_id
+            parent_group_id=parent_group_id,
+            child_group_id=child_group_id,
+            parent_speaker_id=parent_speaker_id,
         )
 
     def get_audio_segments(self):
         audio_segment_list = []
         segment_idx = 0
         for speaker_id in self.audio_diarization_03.keys():
-            for speech_segment_start, speech_segment_end in self.audio_diarization_03[speaker_id]:
+            for speech_segment_start, speech_segment_end in self.audio_diarization_03[
+                speaker_id
+            ]:
                 audio_segment = PyannoteAudioSegment(
                     segment_idx=segment_idx,
                     audio_segment_start=speech_segment_start,
                     audio_segment_end=speech_segment_end,
                     ad_03_speaker=speaker_id,
                     ad_06_speaker=self.get_corresponding_speaker(
-                        present_group_id="ad_03", target_group_id="ad_06", speaker_id=speaker_id
+                        present_group_id="ad_03",
+                        target_group_id="ad_06",
+                        speaker_id=speaker_id,
                     ),
                     ad_09_speaker=self.get_corresponding_speaker(
-                        present_group_id="ad_03", target_group_id="ad_09", speaker_id=speaker_id
+                        present_group_id="ad_03",
+                        target_group_id="ad_09",
+                        speaker_id=speaker_id,
                     ),
                     ad_12_speaker=self.get_corresponding_speaker(
-                        present_group_id="ad_03", target_group_id="ad_12", speaker_id=speaker_id
+                        present_group_id="ad_03",
+                        target_group_id="ad_12",
+                        speaker_id=speaker_id,
                     ),
-                    vd_speaker=self.get_mapping([(speech_segment_start, speech_segment_end)], self.video_diarization),
+                    vd_speaker=self.get_mapping(
+                        [(speech_segment_start, speech_segment_end)],
+                        self.video_diarization,
+                    ),
                     has_overlap=False,
                 )
                 audio_segment_list.append(audio_segment)
@@ -240,7 +291,10 @@ class DiarizationOutput:
         # Check whether each audio segment has overlap with other audio segments
         for i in range(len(audio_segment_list)):
             for j in range(i + 1, len(audio_segment_list)):
-                if audio_segment_list[i].audio_segment_end > audio_segment_list[j].audio_segment_start:
+                if (
+                    audio_segment_list[i].audio_segment_end
+                    > audio_segment_list[j].audio_segment_start
+                ):
                     audio_segment_list[i].has_overlap = True
                     audio_segment_list[j].has_overlap = True
                     audio_segment_list[i].vd_speaker = "Unknown"
@@ -288,7 +342,9 @@ class DiarizationOutput:
     def predict_unknowns(self):
         for audio_segment in self.audio_segments:
             if audio_segment.vd_speaker == "Unknown":
-                vd_speaker = self.ad03_video_mapping.get_max_mapping(audio_segment.ad_03_speaker)
+                vd_speaker = self.ad03_video_mapping.get_max_mapping(
+                    audio_segment.ad_03_speaker
+                )
                 if vd_speaker is not None:
                     audio_segment.vd_speaker = vd_speaker
                     self.ad03_video_mapping.add_mapping(
@@ -299,7 +355,9 @@ class DiarizationOutput:
                     )
                 else:
                     # audio_segment.vd_speaker = f"Unknown_{audio_segment.ad_03_speaker}"
-                    vd_speaker = self.ad06_video_mapping.get_max_mapping(audio_segment.ad_06_speaker)
+                    vd_speaker = self.ad06_video_mapping.get_max_mapping(
+                        audio_segment.ad_06_speaker
+                    )
                     if vd_speaker is not None:
                         audio_segment.vd_speaker = vd_speaker
                         self.ad06_video_mapping.add_mapping(
@@ -310,7 +368,9 @@ class DiarizationOutput:
                         )
                     else:
                         # audio_segment.vd_speaker = f"Unknown_{audio_segment.ad_06_speaker}"
-                        vd_speaker = self.ad09_video_mapping.get_max_mapping(audio_segment.ad_09_speaker)
+                        vd_speaker = self.ad09_video_mapping.get_max_mapping(
+                            audio_segment.ad_09_speaker
+                        )
                         if vd_speaker is not None:
                             audio_segment.vd_speaker = vd_speaker
                             self.ad09_video_mapping.add_mapping(
@@ -321,7 +381,9 @@ class DiarizationOutput:
                             )
                         else:
                             # audio_segment.vd_speaker = f"Unknown_{audio_segment.ad_09_speaker}"
-                            vd_speaker = self.ad12_video_mapping.get_max_mapping(audio_segment.ad_12_speaker)
+                            vd_speaker = self.ad12_video_mapping.get_max_mapping(
+                                audio_segment.ad_12_speaker
+                            )
                             if vd_speaker is not None:
                                 audio_segment.vd_speaker = vd_speaker
                                 self.ad12_video_mapping.add_mapping(
@@ -331,7 +393,9 @@ class DiarizationOutput:
                                     audio_segment_end=audio_segment.audio_segment_end,
                                 )
                             else:
-                                audio_segment.vd_speaker = f"Unknown_{audio_segment.ad_12_speaker}"
+                                audio_segment.vd_speaker = (
+                                    f"Unknown_{audio_segment.ad_12_speaker}"
+                                )
 
     def get_diarization_output(self, videoDuration, video_save_name, plot_name):
         diarize_output = {}
@@ -368,7 +432,7 @@ class DiarizationOutput:
         max_overlap = 0
         max_overlap_speaker = "Unknown"
         for speaker_id in target_group.keys():
-            result_overlap, _ = utils.find_overlap(
+            result_overlap, _ = components.find_overlap(
                 speaker_interval,
                 target_group[speaker_id],
             )

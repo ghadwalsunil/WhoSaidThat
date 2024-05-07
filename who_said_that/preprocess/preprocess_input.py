@@ -1,12 +1,12 @@
 import os
-from shutil import rmtree
-from typing import List
 import sys
 import time
+from shutil import rmtree
+from typing import List
 
 from who_said_that import params
-from who_said_that.video_list import VideoFile
 from who_said_that.preprocess import utils
+from who_said_that.video_list import VideoFile
 
 
 class Preprocess:
@@ -25,14 +25,21 @@ class Preprocess:
         if not os.path.exists(self.video_output_folder):
             os.mkdir(self.video_output_folder)
 
-        input_video_path = os.path.join(self.video_file.video_folder, self.video_file.name + ".mp4")
+        input_video_path = os.path.join(
+            self.video_file.video_folder, self.video_file.name + ".mp4"
+        )
         if not os.path.isfile(input_video_path):
-            input_video_path = os.path.join(self.video_file.video_folder, self.video_file.name + ".mkv")
+            input_video_path = os.path.join(
+                self.video_file.video_folder, self.video_file.name + ".mkv"
+            )
             if not os.path.isfile(input_video_path):
                 sys.stderr.write("Video file not found: %s\n" % input_video_path)
                 return False
 
-        sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Preprocessing video %s \r\n" % (self.video_file.save_name))
+        sys.stderr.write(
+            time.strftime("%Y-%m-%d %H:%M:%S")
+            + " Preprocessing video %s \r\n" % (self.video_file.save_name)
+        )
         savePath = os.path.join(self.video_output_folder, self.video_file.save_name)
         pyaviPath = os.path.join(savePath, params.PYAVI_FOLDER_NAME)
         pywavPath = os.path.join(savePath, params.PYWAV_FOLDER_NAME)

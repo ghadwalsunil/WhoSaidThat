@@ -3,7 +3,9 @@ def get_word_to_speaker_mapping(word_start, word_end, final_output):
     max_overlap = 0
 
     for speaker_key in final_output.keys():
-        word_overlap, _ = find_overlap([(word_start, word_end)], final_output[speaker_key])
+        word_overlap, _ = find_overlap(
+            [(word_start, word_end)], final_output[speaker_key]
+        )
         if word_overlap > max_overlap:
             final_speaker = speaker_key
             max_overlap = word_overlap
@@ -72,7 +74,6 @@ def get_mapping(diarization_result_1, diarization_result_2):
 
 
 def get_speaker_label(
-    video_name,
     word_start,
     word_end,
     final_video_output,
@@ -80,14 +81,18 @@ def get_speaker_label(
     final_video_audio_mapping,
     final_audio_video_mapping,
 ):
-    audio_speaker = get_word_to_speaker_mapping(word_start, word_end, final_audio_output[video_name])
-    video_speaker = get_word_to_speaker_mapping(word_start, word_end, final_video_output[video_name])
+    audio_speaker = get_word_to_speaker_mapping(
+        word_start, word_end, final_audio_output
+    )
+    video_speaker = get_word_to_speaker_mapping(
+        word_start, word_end, final_video_output
+    )
 
     if video_speaker == "Unknown":
         if audio_speaker == "Unknown":
             return "Unknown"
         else:
-            return final_audio_video_mapping[video_name][audio_speaker]
+            return final_audio_video_mapping[audio_speaker]
     else:
         return video_speaker
 
@@ -108,12 +113,16 @@ def match_output(output_df, output_type):
                 video_speaker_match[assigned_speaker] = "Unknown"
             else:
                 video_speaker_match[assigned_speaker] = (
-                    temp_df[temp_df[f"{output_type}_assigned_speaker"] == assigned_speaker]["speaker"]
+                    temp_df[
+                        temp_df[f"{output_type}_assigned_speaker"] == assigned_speaker
+                    ]["speaker"]
                     .value_counts()
                     .idxmax()
                 )
                 speaker_count[assigned_speaker] = len(
-                    temp_df[temp_df[f"{output_type}_assigned_speaker"] == assigned_speaker]
+                    temp_df[
+                        temp_df[f"{output_type}_assigned_speaker"] == assigned_speaker
+                    ]
                 )
 
         temp_count = {}
@@ -144,7 +153,9 @@ def match_output(output_df, output_type):
         assigned_speaker_match[video_name] = video_speaker_match
 
     output_df[f"{output_type}_matched_speaker"] = output_df.apply(
-        lambda row: assigned_speaker_match[row["video_name"]][row[f"{output_type}_assigned_speaker"]],
+        lambda row: assigned_speaker_match[row["video_name"]][
+            row[f"{output_type}_assigned_speaker"]
+        ],
         axis=1,
     )
 
@@ -162,12 +173,16 @@ def compute_performance(output_df, output_type):
             return "Match_False"
 
     output_df[f"{output_type}_matched_result"] = output_df.apply(
-        lambda row: speaker_match(row["speaker"], row[f"{output_type}_matched_speaker"]),
+        lambda row: speaker_match(
+            row["speaker"], row[f"{output_type}_matched_speaker"]
+        ),
         axis=1,
     )
 
     output_df = (
-        output_df.groupby(by=["video_name", f"{output_type}_matched_result"]).count()[["segment_id"]].reset_index()
+        output_df.groupby(by=["video_name", f"{output_type}_matched_result"])
+        .count()[["segment_id"]]
+        .reset_index()
     )
     output_df.rename(columns={"segment_id": "count"}, inplace=True)
 
@@ -194,10 +209,12 @@ def compute_performance(output_df, output_type):
 
     # Calculate accuracy
     df_pivot[f"{output_type}_accuracy"] = (
-        df_pivot["Match_True"] / (df_pivot["Match_True"] + df_pivot["Match_False"] + df_pivot["Unassigned"])
+        df_pivot["Match_True"]
+        / (df_pivot["Match_True"] + df_pivot["Match_False"] + df_pivot["Unassigned"])
     ) * 100
     df_pivot[f"{output_type}_unassigned"] = (
-        df_pivot["Unassigned"] / (df_pivot["Match_True"] + df_pivot["Match_False"] + df_pivot["Unassigned"])
+        df_pivot["Unassigned"]
+        / (df_pivot["Match_True"] + df_pivot["Match_False"] + df_pivot["Unassigned"])
     ) * 100
 
     # Rename columns

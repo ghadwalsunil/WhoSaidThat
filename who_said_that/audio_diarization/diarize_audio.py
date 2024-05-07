@@ -7,8 +7,8 @@ from typing import List
 from pydub import AudioSegment
 
 from who_said_that import params
-from who_said_that.utils import components
 from who_said_that.evaluation import utils
+from who_said_that.utils import components
 from who_said_that.video_list import VideoFile
 
 
@@ -22,11 +22,14 @@ class AudioDiarization:
         self.video_file = video_file
         self.video_output_folder = video_output_folder
 
-    def perform_audio_diarization(self, pretrained_pipeline, pipeline_name, videoDuration):
+    def perform_audio_diarization(
+        self, pretrained_pipeline, pipeline_name, videoDuration
+    ):
 
         sys.stderr.write(
             time.strftime("%Y-%m-%d %H:%M:%S")
-            + " Audio Diarization of video %s %s \r\n" % (self.video_file.save_name, pipeline_name)
+            + " Audio Diarization of video %s %s \r\n"
+            % (self.video_file.save_name, pipeline_name)
         )
         savePath = os.path.join(self.video_output_folder, self.video_file.save_name)
         pywavPath = os.path.join(savePath, params.PYWAV_FOLDER_NAME)

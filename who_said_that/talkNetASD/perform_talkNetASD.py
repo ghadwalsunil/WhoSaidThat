@@ -4,9 +4,9 @@ import time
 from typing import List
 
 from who_said_that import params
-from who_said_that.video_list import VideoFile
 from who_said_that.models.talkNet import talkNet
 from who_said_that.talkNetASD import utils
+from who_said_that.video_list import VideoFile
 
 
 class TalkNetASD:
@@ -38,8 +38,15 @@ class TalkNetASD:
         videoFilePath = os.path.join(pyaviPath, "video.mp4")
         audioFilePath = os.path.join(pywavPath, "audio.wav")
 
-        utils.scene_detect(videoFilePath=videoFilePath, pyworkPath=pyworkPath, pyframesPath=pyframesPath)
-        sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Scene detection and save in %s \r\n" % (pyworkPath))
+        utils.scene_detect(
+            videoFilePath=videoFilePath,
+            pyworkPath=pyworkPath,
+            pyframesPath=pyframesPath,
+        )
+        sys.stderr.write(
+            time.strftime("%Y-%m-%d %H:%M:%S")
+            + " Scene detection and save in %s \r\n" % (pyworkPath)
+        )
 
         # Face detection for the video frames
         utils.inference_video(
@@ -47,7 +54,10 @@ class TalkNetASD:
             pyframesPath=pyframesPath,
             pyworkPath=pyworkPath,
         )
-        sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Face detection and save in %s \r\n" % (pyworkPath))
+        sys.stderr.write(
+            time.strftime("%Y-%m-%d %H:%M:%S")
+            + " Face detection and save in %s \r\n" % (pyworkPath)
+        )
 
         # Face tracking
         utils.track_faces(
@@ -78,5 +88,6 @@ class TalkNetASD:
                 saveMarkedFrames=self.saveMarkedFrames,
             )
             sys.stderr.write(
-                time.strftime("%Y-%m-%d %H:%M:%S") + " Visualization and save in %s \r\n" % (pyaviPath)
+                time.strftime("%Y-%m-%d %H:%M:%S")
+                + " Visualization and save in %s \r\n" % (pyaviPath)
             )

@@ -1,10 +1,18 @@
-import sys, os
+import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from who_said_that.evaluation.utils import compute_word_diarization_error_rate
-import pandas as pd
 import pickle
-temp = pickle.load(open("output/run_output/final_diarization_output_MY_DATASET.pckl", "rb"))
+
+import pandas as pd
+
+from who_said_that.evaluation.utils import compute_word_diarization_error_rate
+
+temp = pickle.load(
+    open("output/run_output/final_diarization_output_MY_DATASET.pckl", "rb")
+)
+
 
 def convert_rttm_to_diarization(rttm_file, offset):
 
@@ -13,7 +21,18 @@ def convert_rttm_to_diarization(rttm_file, offset):
         rttm_file,
         sep=" ",
         header=None,
-        names=["temp", "file_name", "channel", "start", "duration", "NA_1", "NA_2", "speaker_label", "NA_3", "NA_4"],
+        names=[
+            "temp",
+            "file_name",
+            "channel",
+            "start",
+            "duration",
+            "NA_1",
+            "NA_2",
+            "speaker_label",
+            "NA_3",
+            "NA_4",
+        ],
     )
 
     rttm_df.sort_values(by="start", inplace=True)
@@ -32,15 +51,20 @@ def convert_rttm_to_diarization(rttm_file, offset):
 
     return diarize_dict
 
+
 rttm_dir = "../AVA-AVD/save/token/avaavd/rttms/"
 ground_truth_dir = "/vol3/sunil/AVA-AVD/dataset/csv/"
 
 final_results = []
 
 for video_file in temp.keys():
-    diarize_output = convert_rttm_to_diarization(os.path.join(rttm_dir, f"{video_file}.rttm"), 0)
+    diarize_output = convert_rttm_to_diarization(
+        os.path.join(rttm_dir, f"{video_file}.rttm"), 0
+    )
     video_results = {"video_name": video_file}
-    ground_truth = pd.read_csv(os.path.join(ground_truth_dir, f"{video_file}.csv"), sep="\t")
+    ground_truth = pd.read_csv(
+        os.path.join(ground_truth_dir, f"{video_file}.csv"), sep="\t"
+    )
     video_results.update(
         compute_word_diarization_error_rate(ground_truth, diarize_output)
     )

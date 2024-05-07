@@ -1,5 +1,10 @@
 class TrackCluster:
-    def __init__(self, track_cluster_cluster_id, track_cluster_cluster_count, track_cluster_percent):
+    def __init__(
+        self,
+        track_cluster_cluster_id,
+        track_cluster_cluster_count,
+        track_cluster_percent,
+    ):
         self.track_cluster_cluster_id = track_cluster_cluster_id
         self.track_cluster_cluster_count = track_cluster_cluster_count
         self.track_cluster_percent = track_cluster_percent
@@ -103,8 +108,6 @@ class TrackList:
                     existing_sets.update(cluster_set)
                 else:
                     existing_sets_list.append(cluster_set)
-
-        
 
         # assign the first value of the set to all the values in the set
         final_combo_clusters = {}

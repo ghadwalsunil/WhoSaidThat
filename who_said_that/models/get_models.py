@@ -45,7 +45,10 @@ class Models:
             return None
 
     def get_pretrained_pipeline(
-        self, pretrained_pipeline_name: str = "pyannote/speaker-diarization-3.0", min_cluster_size: int = 12, threshold: float = 0.6
+        self,
+        pretrained_pipeline_name: str = "pyannote/speaker-diarization-3.0",
+        min_cluster_size: int = 12,
+        threshold: float = 0.6,
     ) -> Optional[Pipeline]:
         if self.load_pretrained_pipeline:
             sys.stderr.write(
@@ -56,7 +59,7 @@ class Models:
             )
             pretrained_pipeline.to(torch.device("cuda"))
             PRETRAINED_PIPELINE_PARAMS = {
-                "clustering" : {
+                "clustering": {
                     "min_cluster_size": min_cluster_size,
                 }
             }

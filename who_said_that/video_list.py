@@ -3,6 +3,8 @@ from typing import Literal
 
 import pandas as pd
 
+from who_said_that.num_speakers import NUM_OF_SPEAKERS
+
 # Input paramters
 # VIDEO_FOLDER = "/vol3/sunil/AVA-AVD/dataset/videos"
 VIDEO_FOLDER = "/vol3/sunil/FinalDataset"
@@ -22,6 +24,7 @@ class VideoFile:
         ground_truth_type="der",
         ground_truth_file=None,
         del_intermediate_files=True,
+        num_speakers=-1,
     ):
         self.name = name
         self.video_folder = video_folder
@@ -32,6 +35,7 @@ class VideoFile:
         self.ground_truth_type: Literal["der", "wder"] = ground_truth_type
         self.ground_truth_file = ground_truth_file
         self.del_intermediate_files = del_intermediate_files
+        self.num_speakers = num_speakers
 
     def __str__(self):
         return f"VideoFile({self.name}, {self.save_name})\n"
@@ -47,14 +51,17 @@ VIDEO_FILES = [
         video_folder=os.path.join(VIDEO_FOLDER, "videos"),
         save_name=os.path.splitext(f)[0],
         ground_truth_type="wder",
-        ground_truth_file=os.path.join(
-            VIDEO_FOLDER, "csv", f"{os.path.splitext(f)[0]}.csv"
-        ),
+        ground_truth_file=os.path.join(VIDEO_FOLDER, "csv", f"{os.path.splitext(f)[0]}.csv"),
         del_intermediate_files=True,
+        # num_speakers=NUM_OF_SPEAKERS.get(os.path.splitext(f)[0], -1),
     )
     for f in os.listdir(os.path.join(VIDEO_FOLDER, "videos"))
     if os.path.isfile(os.path.join(VIDEO_FOLDER, "videos", f))
     and os.path.splitext(f)[1] in [".mp4", ".mkv"]
+    and os.path.splitext(f)[0]
+    in [
+        "StarTalk_Farming_1059_1180",
+    ]
 ]
 
 

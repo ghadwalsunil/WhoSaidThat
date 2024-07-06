@@ -160,18 +160,34 @@ def get_track_face_encodings(tracks, scores, pyframesPath, pyworkPath):
 #     return df
 
 
-def perform_clustering(pyworkPath, simple_clustering=True, enhanced_clustering=True):
+def perform_clustering(
+    pyworkPath, simple_clustering=True, enhanced_clustering=False, kmeans_clusters=-1
+):
     df: pd.DataFrame = pd.read_pickle(os.path.join(pyworkPath, "encoding_df.pckl"))
     if simple_clustering:
-        df["SimpleClusters"] = util_components.perform_clustering(
-            df["Encoding"].to_list(), max_clusters=6, silhouette_threshold=0
+        df["SimpleClusters_wo_Track"] = util_components.perform_clustering(
+            df["Encoding"].to_list(),
+            max_clusters=6,
+            silhouette_threshold=0,
+            input_clusters=kmeans_clusters,
         )
+
+        # For each track, assign the majority cluster as the cluster for the track
+        track_clusters = {}
+        for track in df["Track"].unique():
+            track_clusters[track] = (
+                df[df["Track"] == track]["SimpleClusters_wo_Track"].mode().values[0]
+            )
+
+        df["SimpleClusters"] = df["Track"].apply(lambda x: track_clusters[x])
 
     if enhanced_clustering:
         final_df_cents, track_centroids_df = util_components.get_subset(df)
         track_centroids_df["Track_Cluster_Cluster_ID"] = (
             util_components.perform_clustering(
-                list(track_centroids_df["Track_Cluster_Centroid"]), max_clusters=12
+                list(track_centroids_df["Track_Cluster_Centroid"]),
+                max_clusters=12,
+                input_clusters=kmeans_clusters,
             )
         )
 

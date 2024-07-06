@@ -4,6 +4,7 @@ TRANSCRIPTION_DF_PATH = "Dataset/All_Transcriptions_WithSpeakers.xlsx"
 
 # Output parameters
 PARENT_DIR = "/home/sunil/projects/Stuff/Combined/WhoSaidThat"
+# PARENT_DIR = "/vol3/sunil/"
 VIDEO_OUTPUT_FOLDER = os.path.join(PARENT_DIR, "output", "video_temp")
 RUN_OUTPUT_FOLDER = os.path.join(PARENT_DIR, "output", "run_output")
 PYAVI_FOLDER_NAME = "pyavi"
@@ -14,6 +15,7 @@ PYCROP_FOLDER_NAME = "pycrop"
 SRT_OUTPUT_FOLDER = os.path.join(RUN_OUTPUT_FOLDER, "srt")
 JS_OUTPUT_FOLDER = os.path.join(RUN_OUTPUT_FOLDER, "js")
 PLOT_OUTPUT_FOLDER = os.path.join(RUN_OUTPUT_FOLDER, "plots")
+SPEAKER_STATS_FOLDER = os.path.join(RUN_OUTPUT_FOLDER, "speaker_stats")
 
 # TalkNet parameters
 TALKNET_PRETRAIN_MODEL_PATH = "who_said_that/utils/pretrain_TalkSet.model"

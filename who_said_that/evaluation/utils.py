@@ -1,6 +1,6 @@
 import pandas as pd
 from pyannote.core import Annotation, Segment
-
+from who_said_that.utils.components import find_overlap
 from who_said_that.evaluation import util_components
 
 
@@ -56,7 +56,7 @@ def match_output(output_df):
     return output_df
 
 
-def compute_performance(output_df):
+def compute_performance(output_df: pd.DataFrame):
 
     def speaker_match(speaker, assigned_speaker, matched_speaker):
         if assigned_speaker == "Unassigned":
@@ -73,7 +73,7 @@ def compute_performance(output_df):
         axis=1,
     )
 
-    return output_df["matched_result"].value_counts().to_dict()
+    return output_df
 
 
 def compute_word_diarization_error_rate(ground_truth: pd.DataFrame, diarization_output):
@@ -128,10 +128,61 @@ def compute_word_diarization_error_rate_combined(
         axis=1,
     )
 
-    ground_truth.to_excel("../del_later/temp_new.xlsx", index=False)
-
     matched_df = match_output(ground_truth)
     return compute_performance(matched_df)
+
+
+def get_additional_info(
+    ground_truth: pd.DataFrame,
+    audio_diarization_output,
+    video_diarization_output,
+    video_name,
+    save_path,
+):
+
+    ground_truth = ground_truth.copy()
+
+    ground_truth = ground_truth[["word", "word_start", "word_end", "speaker"]]
+
+    for audio_speaker in audio_diarization_output.keys():
+        ground_truth[f"audio_{audio_speaker}"] = ground_truth.apply(
+            lambda row: find_overlap(
+                [
+                    (
+                        row["word_start"],
+                        (
+                            row["word_end"]
+                            if row["word_end"] > row["word_start"]
+                            else row["word_end"] + 0.01
+                        ),
+                    )
+                ],
+                audio_diarization_output[audio_speaker],
+            )[0],
+            axis=1,
+        )
+
+    for video_speaker in video_diarization_output.keys():
+        ground_truth[f"video_{video_speaker}"] = ground_truth.apply(
+            lambda row: find_overlap(
+                [
+                    (
+                        row["word_start"],
+                        (
+                            row["word_end"]
+                            if row["word_end"] > row["word_start"]
+                            else row["word_end"] + 0.01
+                        ),
+                    )
+                ],
+                video_diarization_output[video_speaker],
+            )[0],
+            axis=1,
+        )
+
+    ground_truth.to_excel(f"{save_path}/{video_name}_additional_info.xlsx", index=False)
+
+    return ground_truth
 
 
 def convert_rttm_to_diarization(rttm_file, offset):

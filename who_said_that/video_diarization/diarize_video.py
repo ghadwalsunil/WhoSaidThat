@@ -19,8 +19,7 @@ class VideoDiarization:
     def perform_video_diarization(self, videoDuration):
 
         sys.stderr.write(
-            time.strftime("%Y-%m-%d %H:%M:%S")
-            + " Video diarization of video %s \r\n" % (self.video_file.save_name)
+            time.strftime("%Y-%m-%d %H:%M:%S") + " Video diarization of video %s \r\n" % (self.video_file.save_name)
         )
         savePath = os.path.join(self.video_output_folder, self.video_file.save_name)
         pywavPath = os.path.join(savePath, params.PYWAV_FOLDER_NAME)
@@ -47,14 +46,9 @@ class VideoDiarization:
             scores=scores,
         )
 
-        utils.perform_clustering(pyworkPath=pyworkPath)
+        utils.perform_clustering(pyworkPath=pyworkPath, kmeans_clusters=self.video_file.num_speakers)
 
-        video_output_simple = utils.get_final_tracks(
-            pyworkPath, videoFrameRate, cluster_column="SimpleClusters"
-        )
-        video_output_enhanced = utils.get_final_tracks(
-            pyworkPath, videoFrameRate, cluster_column="EnhancedClusters"
-        )
+        video_output_simple = utils.get_final_tracks(pyworkPath, videoFrameRate, cluster_column="SimpleClusters")
 
         components.create_annotation_plot(
             diarization_output=video_output_simple,
@@ -63,12 +57,5 @@ class VideoDiarization:
             video_duration=videoDuration,
             plot_name="video_simple",
         )
-        components.create_annotation_plot(
-            diarization_output=video_output_enhanced,
-            save_path=params.PLOT_OUTPUT_FOLDER,
-            video_name=self.video_file.save_name,
-            video_duration=videoDuration,
-            plot_name="video_enhanced",
-        )
 
-        return video_output_simple, video_output_enhanced
+        return video_output_simple

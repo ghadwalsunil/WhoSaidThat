@@ -4,13 +4,13 @@
 *.wav
 *.mp4
 *.pcm
-*.xlsx
+# *.xlsx
 data/
 tests/
 exps/
 demo/*
 Videos/*
-Dataset/*
+# Dataset/*
 Clips/*
 output/*
 .vscode/*
